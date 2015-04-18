@@ -23,7 +23,7 @@ public class Checkers
         foreach(GamePiece curPiece in AIPieces.Values)
         {
             Vector2 tempDest = Vector2.zero;
-            int tempScore = GetBestMove(ref tempDest, curPiece, gameBoard, 0, 3);
+            int tempScore = GetBestMove(ref tempDest, curPiece, gameBoard, 0, 6);
 
             if(tempScore > score)
             {
@@ -51,137 +51,181 @@ public class Checkers
         return killedPiece;
     }
 
-    public static bool ValidMove(Vector2 move)
+    //Is the move within the gameboard
+    static bool ValidMove(Vector2 move)
     {
         return move.x >= 0 && move.y >= 0 && move.x < 8 && move.y < 8;
     }
 
-    public static int GetBestMove(ref Vector2 dest, GamePiece Piece, Dictionary<Vector2, GamePiece> GameBoard, int CurDepth, int MaxDepth)
+    //Calculate the score for the proposed move in dir
+    static int CalculateMove(ref Vector2 dest, Vector2 dir, GamePiece Piece, Dictionary<Vector2, GamePiece> GameBoard)
     {
-        if (CurDepth == MaxDepth)
+        int score = -1;
+
+        Vector2 loc = (Piece.CurLoc + dir);
+        if (!ValidMove(loc))
+        {
+            score = -1;
+        }
+        else if (GameBoard.ContainsKey(loc))
+        {
+            GamePiece temp = GameBoard[(loc)];
+            if (temp.Player != Piece.Player)
+            {
+                loc += dir;
+                if (!ValidMove(loc))
+                {
+                    score = -1;
+                }
+                else if (!GameBoard.ContainsKey(loc))
+                {
+                    dest = loc;
+                    score = 50;
+                }
+                else
+                {
+                    score = -1;
+                }
+            }
+            else
+            {
+                score = -1;
+            }
+        }
+        else
+        {
+            dest = loc;
+            score = 1;
+        }
+
+        return score;
+    }
+
+    //Recusivly calculate the best posible move for this piece
+    static int GetBestMove(ref Vector2 dest, GamePiece Piece, Dictionary<Vector2, GamePiece> GameBoard, int CurDepth, int MaxDepth)
+    {
+        if (CurDepth >= MaxDepth)
         {
             return 0;
         }
 
-        int leftScore = -1;
-        int rightScore = -1;
+        int leftScoreF = -1;
+        int rightScoreF = -1;
+        int leftScoreR = -1;
+        int rightScoreR = -1;
 
         Vector2 moveL = new Vector2(-1,1);
-        Vector2 moveR = new Vector2(-1,-1);
+        Vector2 moveR = new Vector2(-1, -1);
+        Vector2 moveLR = new Vector2(-1, 1);
+        Vector2 moveRR = new Vector2(-1, -1);
 
-        if(Piece.Player == 1)
+        if (Piece.Player == 1)
         {
             moveL *= -1;
             moveR *= -1;
+            moveLR *= -1;
+            moveRR *= -1;
         }
 
-        //calculate left move
-        Vector2 locL = (Piece.CurLoc + moveL);
-        if (!ValidMove(locL))
+        leftScoreF = CalculateMove(ref moveL, moveL, Piece, GameBoard);
+        rightScoreF = CalculateMove(ref moveR, moveR, Piece, GameBoard);
+
+        if(Piece.CanReverse == true)
         {
-            leftScore = -1;
+            moveLR = moveL * -1;
+            moveRR = moveR * -1;
+
+            leftScoreR = CalculateMove(ref moveLR, moveLR, Piece, GameBoard);
+            rightScoreR = CalculateMove(ref moveRR, moveRR, Piece, GameBoard);
         }
-        else if(GameBoard.ContainsKey(locL))
+
+        //Save off all moves to temp pieces
+        GamePiece leftF = new GamePiece();
+        leftF.CurLoc = moveL;
+        leftF.Player = Piece.Player;
+        leftF.CanReverse = Piece.CanReverse;
+
+        GamePiece rightF = new GamePiece();
+        rightF.CurLoc = moveR;
+        rightF.Player = Piece.Player;
+        rightF.CanReverse = Piece.CanReverse;
+
+        GamePiece leftR = new GamePiece();
+        leftR.CurLoc = moveLR;
+        leftR.Player = Piece.Player;
+        leftR.CanReverse = Piece.CanReverse;
+
+        GamePiece rightR = new GamePiece();
+        rightR.CurLoc = moveRR;
+        rightR.Player = Piece.Player;
+        rightR.CanReverse = Piece.CanReverse;
+
+        //Recursivly calculate scores. This ends up being like a minimum spanning tree
+        Vector2 dummy = Vector2.zero;
+        if(leftScoreF != -1)
+            leftScoreF += GetBestMove(ref dummy, leftF, GameBoard, CurDepth + 1, MaxDepth);
+
+        if(rightScoreF != -1)
+            rightScoreF += GetBestMove(ref dummy, rightF, GameBoard, CurDepth + 1, MaxDepth);
+
+        if (leftScoreR != -1)
+            leftScoreR += GetBestMove(ref dummy, leftR, GameBoard, CurDepth + 1, MaxDepth);
+
+        if (rightScoreR != -1)
+            rightScoreR += GetBestMove(ref dummy, rightR, GameBoard, CurDepth + 1, MaxDepth);
+
+        int FBest;
+        Vector2 FBestVec;
+
+        int RBest;
+        Vector2 RBestVec;
+
+        int Best;
+        Vector2 BestVec;
+
+        //Find who did the best
+        //foward
+        if(leftScoreF > rightScoreF)
         {
-            GamePiece temp = GameBoard[(locL)];
-            if(temp.Player != Piece.Player)
-            {
-                locL += moveL;
-                if (!ValidMove(locL))
-                {
-                    leftScore = -1;
-                }
-                else if (!GameBoard.ContainsKey(locL))
-                {
-                    moveL = locL;
-                    leftScore = 2;
-                }
-                else
-                {
-                    leftScore = -1;
-                }
-            }
-            else
-            {
-                leftScore = -1;
-            }
+            FBestVec = moveL;
+            FBest = leftScoreF;
         }
         else
         {
-            moveL = locL;
-            leftScore = 1;
+            FBestVec = moveR;
+            FBest = rightScoreF;
         }
 
-        //calculate right move
-        Vector2 locR = (Piece.CurLoc + moveR);
-        if (!ValidMove(locR))
+        //reverse
+        if (leftScoreR > rightScoreR)
         {
-            rightScore = -1;
-        }
-        else if (GameBoard.ContainsKey(locR))
-        {
-            GamePiece temp = GameBoard[(locR)];
-            if (temp.Player != Piece.Player)
-            {
-                locR += moveR;
-                if (!ValidMove(locR))
-                {
-                    rightScore = -1;
-                }
-                else if (!GameBoard.ContainsKey(locR))
-                {
-                    //We have to take the jump according to the rules
-                    moveR = locR;
-                    rightScore = 20;
-                }
-                else
-                {
-                    rightScore = -1;
-                }
-            }
-            else
-            {
-                rightScore = -1;
-            }
+            RBestVec = moveLR;
+            RBest = leftScoreF;
         }
         else
         {
-            moveR = locR;
-            rightScore = 1;
+            RBestVec = moveRR;
+            RBest = rightScoreR;
         }
 
-
-        GamePiece left = new GamePiece();
-        left.CurLoc = moveL;
-        left.Player = Piece.Player;
-
-        GamePiece right = new GamePiece();
-        right.CurLoc = moveR;
-        right.Player = Piece.Player;
-
-        Vector2 lvec = Vector2.zero;
-        Vector2 rvec = Vector2.zero;
-
-        if(leftScore != -1)
-            leftScore += GetBestMove(ref lvec, left, GameBoard, ++CurDepth, MaxDepth);
-
-        if(rightScore != -1)
-            rightScore += GetBestMove(ref rvec, right, GameBoard, ++CurDepth, MaxDepth);
-        
-        if(leftScore >= rightScore)
+        //both
+        if (FBest > RBest)
         {
-            dest = moveL;
+            Best = FBest;
+            BestVec = FBestVec; 
         }
-        else if(rightScore > leftScore)
+        else
         {
-            dest = moveR;
+            Best = RBest;
+            BestVec = RBestVec; 
         }
 
-        int max = Mathf.Max(leftScore, rightScore);
+        dest = BestVec;
 
-        if (max == -1 && CurDepth > 0)
-            max = 0;
+        //We we have a -1 and we are not on the first layer then just return a 0
+        if (Best == -1 && CurDepth > 0)
+            Best = 0;
 
-        return max;
+        return Best;
     }
 }

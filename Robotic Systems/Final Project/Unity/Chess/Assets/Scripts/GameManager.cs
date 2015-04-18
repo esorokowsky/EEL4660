@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour 
 {
@@ -16,6 +17,11 @@ public class GameManager : MonoBehaviour
 	public Material Player1Mat;
 	public Material Player2Mat;
 
+    public int Player1Score;
+    public int Player2Score;
+    private GameObject _Player1Score;
+    private GameObject _Player2Score;
+
 	private GameObject _GameBoard;
 	private ClientSocket _ClientSocket;
 
@@ -26,6 +32,8 @@ public class GameManager : MonoBehaviour
 	void Start () 
 	{
 		_GameBoard = GameObject.Find("ChessBoard");
+        _Player1Score = GameObject.Find("Score").transform.Find("Player1").gameObject;
+        _Player2Score = GameObject.Find("Score").transform.Find("Player2").gameObject;
 	}
 
     public void InitChess2P()
@@ -35,9 +43,6 @@ public class GameManager : MonoBehaviour
 
         GameObject gameChooser = GameObject.Find("GameChooser");
         gameChooser.SetActive(false);
-
-        GameObject ai = GameObject.Find("NextTurnButton").transform.Find("Button").gameObject;
-        ai.SetActive(true);
     }
 
     public void InitCheckers1P()
@@ -59,9 +64,6 @@ public class GameManager : MonoBehaviour
 
         GameObject gameChooser = GameObject.Find("GameChooser");
         gameChooser.SetActive(false);
-
-        GameObject ai = GameObject.Find("NextTurnButton").transform.Find("Button").gameObject;
-        ai.SetActive(true);
     }
 	
     void InitChess()
@@ -187,7 +189,7 @@ public class GameManager : MonoBehaviour
             }
 
             loc1.x = i/4;
-            GameObject curObject = Player1.transform.Find("Checker Light " + (i + 1)).gameObject;
+            GameObject curObject = Player1.transform.Find("Checker " + (i + 1)).gameObject;
             Player1Pieces.Add(markerNum, new GamePiece(curObject, loc1, Player1Mat, markerNum++, 1));
         }
 
@@ -209,7 +211,7 @@ public class GameManager : MonoBehaviour
             }
 
             loc2.x = 7 - i / 4;
-            GameObject curObject = Player2.transform.Find("Checker Dark " + (i + 1)).gameObject;
+            GameObject curObject = Player2.transform.Find("Checker " + (i + 1)).gameObject;
             Player2Pieces.Add(markerNum, new GamePiece(curObject, loc2, Player2Mat, markerNum++, 2));
         }
 
@@ -230,14 +232,18 @@ public class GameManager : MonoBehaviour
             {
                 killedPiece.Object.SetActive(false);
                 Player1Pieces.Remove(killedPiece.MarkerNum);
+                Player2Score++;
             }
 
+            //debug code to have the ai play both sides
+            /*
             GamePiece killedPiece2 = Checkers.MoveAI(Player2Pieces, Player1Pieces);
             if (killedPiece2 != null)
             {
                 killedPiece2.Object.SetActive(false);
-                Player1Pieces.Remove(killedPiece2.MarkerNum);
-            }
+                Player2Pieces.Remove(killedPiece2.MarkerNum);
+                Player1Score++;
+            }*/
         }
         else if(_GameMode == 3) //Checkers 1P
         {
@@ -248,6 +254,10 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
+        //Update the user scores incase they changed
+        _Player1Score.GetComponent<Text>().text = "Player 1 Score: " + Player1Score;
+        _Player2Score.GetComponent<Text>().text = "Player 2 Score: " + Player2Score;
+
         List<Utilities.Marker> curMarkers = GetMovedMarkers();
 
         //Go through the moved markers and check to see if a piece was killed
@@ -329,10 +339,12 @@ public class GameManager : MonoBehaviour
                 if (killedPlayer == 1)
                 {
                     Player1Pieces.Remove(killedPiece.MarkerNum);
+                    Player2Score++;
                 }
                 else
                 {
                     Player2Pieces.Remove(killedPiece.MarkerNum);
+                    Player1Score++;
                 }
             }
 
@@ -348,8 +360,6 @@ public class GameManager : MonoBehaviour
                 curPiece.MovePiece(curMarker.ScreenLoc);
             }
         }
-
-
 	}
 
     //pull in markers from Aruco
