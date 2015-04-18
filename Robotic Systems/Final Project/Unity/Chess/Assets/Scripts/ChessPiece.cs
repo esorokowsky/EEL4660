@@ -5,13 +5,15 @@ public class ChessPiece
 {
 	public GameObject Model;
 	public int MarkerNumber;
+    public int Player;
 	public Vector2 CurLocation;
 	public Vector2 PrevLocation;
 
-	public ChessPiece(GameObject model, Vector2 startLoc, Material material)
+	public ChessPiece(GameObject model, Vector2 startLoc, Material material, int player)
 	{
 		Model = model;
 		CurLocation = startLoc;
+        Player = player;
 
 		if(material != null)
 			Model.GetComponent<Renderer>().material = material;

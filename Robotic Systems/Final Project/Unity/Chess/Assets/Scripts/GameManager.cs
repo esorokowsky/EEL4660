@@ -81,37 +81,37 @@ public class GameManager : MonoBehaviour
                 //Player 1
                 loc.x = 1;
                 GameObject curObject = Player1.transform.Find("Hi_Pawn " + (i + 1)).gameObject;
-                Player1Pieces.Add(markerNum, new GamePiece(curObject, loc, Player1Mat, markerNum++));
+                Player1Pieces.Add(markerNum, new GamePiece(curObject, loc, Player1Mat, markerNum++, 1));
             }
 
             //King
             GameObject curPiece = Player1.transform.Find("Hi_King").gameObject;
-            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 4), Player1Mat, markerNum++));
+            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 4), Player1Mat, markerNum++, 1));
 
             //Queen
             curPiece = Player1.transform.Find("Hi_Queen").gameObject;
-            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 3), Player1Mat, markerNum++));
+            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 3), Player1Mat, markerNum++, 1));
 
             //Bishops
             curPiece = Player1.transform.Find("Hi_Bishop 1").gameObject;
-            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 2), Player1Mat, markerNum++));
+            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 2), Player1Mat, markerNum++, 1));
 
             curPiece = Player1.transform.Find("Hi_Bishop 2").gameObject;
-            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 5), Player1Mat, markerNum++));
+            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 5), Player1Mat, markerNum++, 1));
 
             //Knights
             curPiece = Player1.transform.Find("Hi_Knight 1").gameObject;
-            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 1), Player1Mat, markerNum++));
+            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 1), Player1Mat, markerNum++, 1));
 
             curPiece = Player1.transform.Find("Hi_Knight 2").gameObject;
-            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 6), Player1Mat, markerNum++));
+            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 6), Player1Mat, markerNum++, 1));
 
             //Rook
             curPiece = Player1.transform.Find("Hi_Rook 1").gameObject;
-            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 0), Player1Mat, markerNum++));
+            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 0), Player1Mat, markerNum++, 1));
 
             curPiece = Player1.transform.Find("Hi_Rook 2").gameObject;
-            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 7), Player1Mat, markerNum++));
+            Player1Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(0, 7), Player1Mat, markerNum++, 1));
         }
 
 
@@ -125,37 +125,37 @@ public class GameManager : MonoBehaviour
                 //Player 2
                 loc.x = 6;
                 GameObject curObject = Player2.transform.Find("Hi_Pawn " + (i + 1)).gameObject;
-                Player2Pieces.Add(markerNum, new GamePiece(curObject, loc, Player2Mat, markerNum++));
+                Player2Pieces.Add(markerNum, new GamePiece(curObject, loc, Player2Mat, markerNum++, 2));
             }
 
             //King
             GameObject curPiece = Player2.transform.Find("Hi_King").gameObject;
-            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 4), Player2Mat, markerNum++));
+            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 4), Player2Mat, markerNum++, 2));
 
             //Queen
             curPiece = Player2.transform.Find("Hi_Queen").gameObject;
-            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 3), Player2Mat, markerNum++));
+            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 3), Player2Mat, markerNum++, 2));
 
             //Bishops
             curPiece = Player2.transform.Find("Hi_Bishop 1").gameObject;
-            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 2), Player2Mat, markerNum++));
+            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 2), Player2Mat, markerNum++, 2));
 
             curPiece = Player2.transform.Find("Hi_Bishop 2").gameObject;
-            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 5), Player2Mat, markerNum++));
+            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 5), Player2Mat, markerNum++, 2));
 
             //Knights
             curPiece = Player2.transform.Find("Hi_Knight 1").gameObject;
-            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 1), Player2Mat, markerNum++));
+            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 1), Player2Mat, markerNum++, 2));
 
             curPiece = Player2.transform.Find("Hi_Knight 2").gameObject;
-            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 6), Player2Mat, markerNum++));
+            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 6), Player2Mat, markerNum++, 2));
 
             //Rooks
             curPiece = Player2.transform.Find("Hi_Rook 1").gameObject;
-            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 0), Player2Mat, markerNum++));
+            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 0), Player2Mat, markerNum++, 2));
 
             curPiece = Player2.transform.Find("Hi_Rook 2").gameObject;
-            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 7), Player2Mat, markerNum++));
+            Player2Pieces.Add(markerNum, new GamePiece(curPiece, new Vector2(7, 7), Player2Mat, markerNum++, 2));
         }
 
         _ClientSocket = new ClientSocket();
@@ -188,7 +188,7 @@ public class GameManager : MonoBehaviour
 
             loc1.x = i/4;
             GameObject curObject = Player1.transform.Find("Checker Light " + (i + 1)).gameObject;
-            Player1Pieces.Add(markerNum, new GamePiece(curObject, loc1, Player1Mat, markerNum++));
+            Player1Pieces.Add(markerNum, new GamePiece(curObject, loc1, Player1Mat, markerNum++, 1));
         }
 
         //Player 2
@@ -210,7 +210,7 @@ public class GameManager : MonoBehaviour
 
             loc2.x = 7 - i / 4;
             GameObject curObject = Player2.transform.Find("Checker Dark " + (i + 1)).gameObject;
-            Player2Pieces.Add(markerNum, new GamePiece(curObject, loc2, Player2Mat, markerNum++));
+            Player2Pieces.Add(markerNum, new GamePiece(curObject, loc2, Player2Mat, markerNum++, 2));
         }
 
         _ClientSocket = new ClientSocket();
@@ -225,7 +225,19 @@ public class GameManager : MonoBehaviour
         }
         else if(_GameMode == 2) //Checkers 1P
         {
-            //Checkers.MoveAI(Player1Pieces, Player2Pieces);
+            GamePiece killedPiece = Checkers.MoveAI(Player1Pieces, Player2Pieces);
+            if (killedPiece != null)
+            {
+                killedPiece.Object.SetActive(false);
+                Player1Pieces.Remove(killedPiece.MarkerNum);
+            }
+
+            GamePiece killedPiece2 = Checkers.MoveAI(Player2Pieces, Player1Pieces);
+            if (killedPiece2 != null)
+            {
+                killedPiece2.Object.SetActive(false);
+                Player1Pieces.Remove(killedPiece2.MarkerNum);
+            }
         }
         else if(_GameMode == 3) //Checkers 1P
         {
@@ -274,7 +286,40 @@ public class GameManager : MonoBehaviour
             }
             else //Checkers
             {
-                
+                //Find the space between the new and old location which is the kill location
+                GamePiece refPiece = Player1Pieces[curMarker.ID];
+                Vector2 killPos = refPiece.CurLoc + curMarker.ScreenLoc;
+                killPos = killPos / 2;
+
+                //Check to see if we landed on a game piece and kill it if we did otherwise just move
+                foreach (GamePiece curPiece in Player1Pieces.Values)
+                {
+                    if (curPiece.CurLoc == killPos)
+                    {
+                        killedPiece = curPiece;
+                        killedPlayer = 1;
+                        break;
+                    }
+                }
+
+                //If no piece was found in player1 pieces then check player 2
+                if (killedPiece == null)
+                {
+                    //Find the space between the new and old location which is the kill location
+                    refPiece = Player1Pieces[curMarker.ID];
+                    killPos = refPiece.CurLoc + curMarker.ScreenLoc;
+                    killPos = killPos / 2;
+
+                    foreach (GamePiece curPiece in Player2Pieces.Values)
+                    {
+                        if (curPiece.CurLoc == killPos)
+                        {
+                            killedPiece = curPiece;
+                            killedPlayer = 2;
+                            break;
+                        }
+                    }
+                }
             }
 
             //If we found a piece to kill then hide it and remove it from the valid pieces
@@ -321,8 +366,8 @@ public class GameManager : MonoBehaviour
         {
             Utilities.Marker temp = new Utilities.Marker();
 
-            temp.ScreenLoc.y = curMarker.ScreenLoc.x / 50;
-            temp.ScreenLoc.x = curMarker.ScreenLoc.y / 50;
+            temp.ScreenLoc.y = (int)(curMarker.ScreenLoc.x / 50);
+            temp.ScreenLoc.x = (int)(curMarker.ScreenLoc.y / 50);
             temp.ID = curMarker.ID;
 
             //Only proccess valid markers
@@ -339,6 +384,10 @@ public class GameManager : MonoBehaviour
 
                 if (curPiece.CurLoc != temp.ScreenLoc)
                     retList.Add(temp);
+            }
+            else
+            {
+                Debug.Log("Marker " + curMarker.ID + " does not exist!!!");
             }
         }
 

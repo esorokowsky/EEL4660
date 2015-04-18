@@ -56,6 +56,11 @@ void sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center)
 	corners.push_back(bl);
 }
 
+float Distance(Point2f p1, Point2f p2)
+{
+	return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
+}
+
 void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 {
 	HANDLE hMutex = io_SharedData->hMutex;
@@ -115,20 +120,83 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 			tempMarker.draw(colorImage, Scalar(0, 0, 255));
 		}
 
+		bool b1, b2, b3, b4;
+		b1 = b2 = b3 = b4 = false;
+
 		//Detect chess board location
 		std::vector<cv::Point2f> corners;
 		for (int i = 0; i < arrMarkers.size(); i++)
 		{
 			Marker curMarker = arrMarkers[i];
 			if (curMarker.id == 1)
+			{
 				corners.push_back(curMarker[1]);
+				b1 = true;
+			}
 			else if (curMarker.id == 2)
+			{
 				corners.push_back(curMarker[0]);
+				b2 = true;
+			}
 			else if (curMarker.id == 3)
+			{
 				corners.push_back(curMarker[3]);
-			else if(curMarker.id == 4)
+				b3 = true;
+			}
+			else if (curMarker.id == 4)
+			{
 				corners.push_back(curMarker[2]);
+				b4 = true;
+			}
 		}
+
+		//If we only found 3 corners lets try to make the other one
+		//experimental only
+		/*if (corners.size() == 3)
+		{
+			if (b1 && b2 && b3)
+			{
+				Point2f newP;
+				Point2f avg = arrMarkers[0][1] + arrMarkers[2][3]; //marker 1 and 3
+				Point2f vec;
+
+				avg.x = avg.x / 2.0f;
+				avg.y = avg.y / 2.0f;
+
+				circle(colorImage, avg, 15, Scalar(0, 0, 255));
+				imshow("RawMarkers", colorImage);
+				waitKey(1);
+
+
+				vec = avg - arrMarkers[1][0]; //marker 2
+				float dist = sqrt(pow(vec.x,2) + pow(vec.y,2));
+
+				vec.x = vec.x / dist;
+				vec.y = vec.y / dist;
+
+				newP.x = vec.x * dist * 2.0f;
+				newP.y = vec.y * dist * 2.0f;
+
+				newP = newP + arrMarkers[1][0];
+
+				circle(colorImage, newP, 15, Scalar(0, 255, 0));
+				imshow("RawMarkers", colorImage);
+				waitKey(1);
+				bool hit = true;
+			}
+			else if (b2 && b3 && b4)
+			{
+
+			}
+			else if (b3 && b4 && b1)
+			{
+
+			}
+			else if (b4 && b1 && b2)
+			{
+
+			}
+		}*/
 
 		if (corners.size() == 4)
 		{
@@ -201,6 +269,8 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 		{
 			float fps = (((float)frameCount) / ((float)difTime)*1000.0f);
 			printf("Fps: %f\n", fps);
+
+			capture.set(CV_CAP_PROP_FPS, (int)fps);
 
 			Start = GetTickCount();
 			frameCount = 0;
