@@ -12,8 +12,10 @@ ArucoInterface::ArucoInterface(int i_nDeviceId)
 	m_pSharedData->bShutdown = false;
 	m_pSharedData->hMutex = m_hThreadMutex;
 	m_pSharedData->nDeviceId = i_nDeviceId;
-	m_pSharedData->nWidth = 960;
-	m_pSharedData->nHeight = 540;
+	//m_pSharedData->nWidth = 960;
+	//m_pSharedData->nHeight = 540;
+	m_pSharedData->nWidth = 640;
+	m_pSharedData->nHeight = 480;
 	m_pSharedData->fMarkerSize = 0.055f;
 	m_pSharedData->CamParams = camParams;
 
@@ -74,7 +76,7 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 	MarkerDetector MDetector;
 	std::vector<Marker> arrMarkers;
 
-	//MDetector.setMinMaxSize(0.0005f);
+	MDetector.setMinMaxSize(0.001f);
 	MDetector.setDesiredSpeed(0);
 
 	VideoCapture capture(nDevice);
@@ -84,10 +86,6 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 		return;
 	}
 
-	capture.set(CV_CAP_PROP_FRAME_WIDTH, nWidth);
-	capture.set(CV_CAP_PROP_FRAME_HEIGHT, nHeight);
-	capture.set(CV_CAP_PROP_FPS, 5);
-
 	camParams.resize(Size(nWidth, nHeight));
 	
 	capture.read(curFrame);
@@ -96,6 +94,10 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 		Sleep(100);
 		capture.read(curFrame);
 	}
+
+	bool w = capture.set(CV_CAP_PROP_FRAME_WIDTH, nWidth);
+	bool h = capture.set(CV_CAP_PROP_FRAME_HEIGHT, nHeight);
+	capture.set(CV_CAP_PROP_FPS, 5);
 
 	int frameCount = 0;
 	long Start = GetTickCount();
@@ -260,7 +262,7 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 
 
 		imshow("RawMarkers", colorImage);
-		imshow("b&w", curFrame);
+		//imshow("b&w", curFrame);
 		waitKey(1);
 
 		frameCount++;

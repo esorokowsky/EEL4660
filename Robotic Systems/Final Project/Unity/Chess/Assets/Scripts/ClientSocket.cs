@@ -4,6 +4,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
+using System.Threading;
 
 public class ClientSocket
 {
@@ -12,6 +13,8 @@ public class ClientSocket
 
     private List<Utilities.Marker> _Markers;
 
+    private Mutex _ThreadMutex;
+
 	public int Port = 5003;
 
 	// Use this for initialization
@@ -19,6 +22,8 @@ public class ClientSocket
 	{
 		if (i_nPort != -1)
 			Port = i_nPort;
+
+        _ThreadMutex = new Mutex();
 
 		try
 		{
@@ -45,8 +50,13 @@ public class ClientSocket
         byte[] recData = new byte[recieved];
         Buffer.BlockCopy(_RecieveBuffer, 0, recData, 0, recieved);
 
-        //Process data here the way you want , all your bytes will be stored in recData
-        _Markers = DecodeMarkers(recieved, _RecieveBuffer);
+
+        if (_ThreadMutex.WaitOne())
+        {
+            //Process data here the way you want , all your bytes will be stored in recData
+            _Markers = DecodeMarkers(recieved, _RecieveBuffer);
+            _ThreadMutex.ReleaseMutex();
+        }
 
         //Start receiving again
         _ClientSocket.BeginReceive(_RecieveBuffer, 0, _RecieveBuffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), null);
@@ -56,13 +66,17 @@ public class ClientSocket
 	{
         List<Utilities.Marker> tempBuffer = new List<Utilities.Marker>();
 
-        if (_Markers != null)
+        if (_ThreadMutex.WaitOne())
         {
-            foreach(Utilities.Marker curMarker in _Markers)
+            if (_Markers != null)
             {
-                tempBuffer.Add(curMarker);
+                foreach (Utilities.Marker curMarker in _Markers)
+                {
+                    tempBuffer.Add(curMarker);
+                }
+                _Markers.Clear();
             }
-            _Markers.Clear();
+            _ThreadMutex.ReleaseMutex();
         }
 
         return tempBuffer;
