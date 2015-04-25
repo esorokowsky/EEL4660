@@ -22,6 +22,19 @@ public:
 		Point3f worldLoc;	//Location of the marker in 3D space
 	};
 
+	struct Corner
+	{
+		int nFrameCount;
+		Point2f ScreenLoc;
+
+		Corner()
+		{
+			nFrameCount = 20;
+			ScreenLoc.x = 0;
+			ScreenLoc.y = 0;
+		}
+	};
+
 	struct SharedData
 	{
 		int nDeviceId;	//The device ID of the camera
@@ -53,5 +66,4 @@ private:
 	HANDLE m_hThreadMutex;
 
 	std::thread m_Thread;
-
 };

@@ -267,6 +267,13 @@ public class GameManager : MonoBehaviour
             GamePiece killedPiece = null;
             int killedPlayer = -1;
 
+
+            if (Player1Pieces.ContainsKey(curMarker.ID) && Player2Pieces.ContainsKey(curMarker.ID))
+            {
+                Debug.Log("Invalid Marker: " + curMarker.ID);
+                continue;
+            }
+
             if (_GameMode == 1) //Chess
             {
                 //Check to see if we landed on a game piece and kill it if we did otherwise just move
@@ -297,18 +304,23 @@ public class GameManager : MonoBehaviour
             else //Checkers
             {
                 //Find the space between the new and old location which is the kill location
-                GamePiece refPiece = Player1Pieces[curMarker.ID];
-                Vector2 killPos = refPiece.CurLoc + curMarker.ScreenLoc;
-                killPos = killPos / 2;
-
-                //Check to see if we landed on a game piece and kill it if we did otherwise just move
-                foreach (GamePiece curPiece in Player1Pieces.Values)
+                Vector2 killPos = Vector2.zero;
+                GamePiece refPiece = null;
+                if(Player1Pieces.ContainsKey(curMarker.ID))
                 {
-                    if (curPiece.CurLoc == killPos)
+                    refPiece = Player1Pieces[curMarker.ID];
+                    killPos = refPiece.CurLoc + curMarker.ScreenLoc;
+                    killPos = killPos / 2;
+
+                    //Check to see if we landed on a game piece and kill it if we did otherwise just move
+                    foreach (GamePiece curPiece in Player1Pieces.Values)
                     {
-                        killedPiece = curPiece;
-                        killedPlayer = 1;
-                        break;
+                        if (curPiece.CurLoc == killPos)
+                        {
+                            killedPiece = curPiece;
+                            killedPlayer = 1;
+                            break;
+                        }
                     }
                 }
 
@@ -316,17 +328,20 @@ public class GameManager : MonoBehaviour
                 if (killedPiece == null)
                 {
                     //Find the space between the new and old location which is the kill location
-                    refPiece = Player1Pieces[curMarker.ID];
-                    killPos = refPiece.CurLoc + curMarker.ScreenLoc;
-                    killPos = killPos / 2;
-
-                    foreach (GamePiece curPiece in Player2Pieces.Values)
+                    if (Player2Pieces.ContainsKey(curMarker.ID))
                     {
-                        if (curPiece.CurLoc == killPos)
+                        refPiece = Player2Pieces[curMarker.ID];
+                        killPos = refPiece.CurLoc + curMarker.ScreenLoc;
+                        killPos = killPos / 2;
+
+                        foreach (GamePiece curPiece in Player1Pieces.Values)
                         {
-                            killedPiece = curPiece;
-                            killedPlayer = 2;
-                            break;
+                            if (curPiece.CurLoc == killPos)
+                            {
+                                killedPiece = curPiece;
+                                killedPlayer = 2;
+                                break;
+                            }
                         }
                     }
                 }

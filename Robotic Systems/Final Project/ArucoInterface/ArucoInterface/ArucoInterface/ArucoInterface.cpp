@@ -1,5 +1,7 @@
 #include "ArucoInterface.h"
 
+std::vector<ArucoInterface::Corner> m_arrCorners;
+
 void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData);
 
 ArucoInterface::ArucoInterface(int i_nDeviceId)
@@ -18,6 +20,11 @@ ArucoInterface::ArucoInterface(int i_nDeviceId)
 	m_pSharedData->nHeight = 480;
 	m_pSharedData->fMarkerSize = 0.055f;
 	m_pSharedData->CamParams = camParams;
+
+	m_arrCorners.push_back(Corner());
+	m_arrCorners.push_back(Corner());
+	m_arrCorners.push_back(Corner());
+	m_arrCorners.push_back(Corner());
 
 	m_Thread = std::thread(MarkerDetectionThread, m_pSharedData);
 }
@@ -97,7 +104,7 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 
 	bool w = capture.set(CV_CAP_PROP_FRAME_WIDTH, nWidth);
 	bool h = capture.set(CV_CAP_PROP_FRAME_HEIGHT, nHeight);
-	capture.set(CV_CAP_PROP_FPS, 5);
+	capture.set(CV_CAP_PROP_FPS, 15);
 
 	int frameCount = 0;
 	long Start = GetTickCount();
@@ -109,7 +116,7 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 		curFrame.copyTo(colorImage);
 
 		cv::cvtColor(curFrame, curFrame, cv::COLOR_BGR2GRAY);
-		cv::inRange(curFrame, Scalar(175, 175, 175), Scalar(255, 255, 255), curFrame);
+		cv::inRange(curFrame, Scalar(125, 125, 125), Scalar(255, 255, 255), curFrame);
 		
 		Mat chessBoard;
 		curFrame.copyTo(chessBoard);
@@ -122,8 +129,10 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 			tempMarker.draw(colorImage, Scalar(0, 0, 255));
 		}
 
-		bool b1, b2, b3, b4;
-		b1 = b2 = b3 = b4 = false;
+		for (int i = 0; i < m_arrCorners.size(); i++)
+		{
+			m_arrCorners[i].nFrameCount++;
+		}
 
 		//Detect chess board location
 		std::vector<cv::Point2f> corners;
@@ -132,25 +141,32 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 			Marker curMarker = arrMarkers[i];
 			if (curMarker.id == 1)
 			{
-				corners.push_back(curMarker[1]);
-				b1 = true;
+				m_arrCorners[0].nFrameCount = 0;
+				m_arrCorners[0].ScreenLoc = curMarker[1];
 			}
 			else if (curMarker.id == 2)
 			{
-				corners.push_back(curMarker[0]);
-				b2 = true;
+				m_arrCorners[1].nFrameCount = 0;
+				m_arrCorners[1].ScreenLoc = curMarker[0];
 			}
 			else if (curMarker.id == 3)
 			{
-				corners.push_back(curMarker[3]);
-				b3 = true;
+				m_arrCorners[2].nFrameCount = 0;
+				m_arrCorners[2].ScreenLoc = curMarker[3];
 			}
 			else if (curMarker.id == 4)
 			{
-				corners.push_back(curMarker[2]);
-				b4 = true;
+				m_arrCorners[3].nFrameCount = 0;
+				m_arrCorners[3].ScreenLoc = curMarker[2];
 			}
 		}
+
+		for (int i = 0; i < m_arrCorners.size(); i++)
+		{
+			if (m_arrCorners[i].nFrameCount < 3)
+				corners.push_back(m_arrCorners[i].ScreenLoc);
+		}
+
 
 		//If we only found 3 corners lets try to make the other one
 		//experimental only
@@ -258,11 +274,15 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 				ReleaseMutex(hMutex);
 			}
 			imshow("ChessBoard", chessBoard);
+			moveWindow("ChessBoard", 1260 + nWidth, nHeight);
 		}
 
 
 		imshow("RawMarkers", colorImage);
-		//imshow("b&w", curFrame);
+		moveWindow("RawMarkers", 1260, 0);
+
+		imshow("b&w", curFrame);
+		moveWindow("b&w", 1260 + nWidth, 0);
 		waitKey(1);
 
 		frameCount++;
@@ -272,7 +292,7 @@ void MarkerDetectionThread(ArucoInterface::SharedData* io_SharedData)
 			float fps = (((float)frameCount) / ((float)difTime)*1000.0f);
 			printf("Fps: %f\n", fps);
 
-			capture.set(CV_CAP_PROP_FPS, (int)fps);
+			//capture.set(CV_CAP_PROP_FPS, (int)fps);
 
 			Start = GetTickCount();
 			frameCount = 0;
